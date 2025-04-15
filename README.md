@@ -1,16 +1,12 @@
-# cemantix
+# cemantbot
 Bot for a web game where you have to guess a word each day (FR + EN).
 
+## Installation
+* Install the [Tampermonkey browser extension](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
+* Add this [userscript](https://raw.githubusercontent.com/Amodio/cemantbot/refs/heads/main/cemantbot_tampermonkey.js). If you cannot install it by clicking on the previous link, you will have to copy/paste it in a new script.
+
+## Usage
 * Go to https://cemantix.certitudes.org or https://cemantle.certitudes.org
-* Load [inject.js](https://cdn.jsdelivr.net/gh/Amodio/cemantix/inject.js "inject.js") using the [Chrome extension Custom Style Script](https://chromewebstore.google.com/detail/custom-style-script/ecjfaoeopefafjpdgnfcjnhinpbldjij "Custom Style Script") or manually into your console (F12):
-```
-function injectScript(src){
-  var script = document.createElement('script');
-  script.src = src;
-  document.head.appendChild(script);
-}
-injectScript('https://cdn.jsdelivr.net/gh/Amodio/cemantix/inject.js')
-```
 It takes about 6 sec to load (more at the first time to cache the binary model).
 * Click the 'Joker!' button and enjoy!
 
