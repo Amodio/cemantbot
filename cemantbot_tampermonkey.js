@@ -9,8 +9,8 @@
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=certitudes.org
 // @grant        none
 // @run-at       document-start
-// @updateURL https://raw.githubusercontent.com/Amodio/cemantbot/refs/heads/main/cemantbot_tampermonkey.js
-// @downloadURL https://raw.githubusercontent.com/Amodio/cemantbot/refs/heads/main/cemantbot_tampermonkey.js
+// @updateURL    https://raw.githubusercontent.com/Amodio/cemantbot/refs/heads/main/cemantbot_tampermonkey.js
+// @downloadURL  https://raw.githubusercontent.com/Amodio/cemantbot/refs/heads/main/cemantbot_tampermonkey.js
 // ==/UserScript==
 
 (function() {
@@ -119,7 +119,7 @@ response_data
     async function loadPythonModel() {
         console.time('loadPythonModel total (~6s)');
         console.time('loadPythonModel: load gensim pkg with Pyodide (~3s)');
-        pyodide = await loadPyodide();
+        pyodide = await window.loadPyodide();
         await pyodide.loadPackage('gensim');
         console.timeEnd('loadPythonModel: load gensim pkg with Pyodide (~3s)');
         console.time('loadPythonModel: download');
