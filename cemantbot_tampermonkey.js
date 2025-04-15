@@ -4,11 +4,12 @@
 // @version      2025-04-15
 // @description  Bot for Cemantix/Cemantle word games
 // @author       Amodio
-// @match        https://cemantix.certitudes.org/*
-// @match        https://cemantle.certitudes.org/*
+// @match        https://cemantix.certitudes.org/
+// @match        https://cemantle.certitudes.org/
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=certitudes.org
 // @grant        none
 // @run-at       document-start
+// @downloadURL https://raw.githubusercontent.com/Amodio/cemantbot/refs/heads/main/cemantbot_tampermonkey.js
 // ==/UserScript==
 
 (function() {
