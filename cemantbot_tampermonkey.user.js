@@ -4,8 +4,8 @@
 // @version      2025-04-23
 // @description  Bot for Cemantix/Cemantle word games
 // @author       Amodio
-// @match        https://cemantix.certitudes.org
-// @match        https://cemantle.certitudes.org
+// @match        https://cemantix.certitudes.org/*
+// @match        https://cemantle.certitudes.org/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=certitudes.org
 // @grant        GM_xmlhttpRequest
 // @run-at       document-start
