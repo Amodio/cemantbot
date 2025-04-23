@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Cemantix/Cemantle bot
 // @namespace    https://github.com/Amodio
-// @version      2025-04-24
+// @version      2025-04-24.1
 // @description  Bot for Cemantix/Cemantle word games
 // @author       Amodio
 // @match        https://cemantix.certitudes.org/*
@@ -97,26 +97,6 @@
         subtree: true
     });
 
-    // Return the next word to try
-    async function getWord() {
-        const tmp = JSON.parse(localStorage.getItem("guesses"));
-
-        // Update the similarities (words) map if the user has added some
-        if (tmp != null && tried_words != Object.keys(tmp).length) {
-            similarities.clear();
-            // `[word, [try_number, [temp, 1000_closeness]], ...]` -> `word:temp, ...`
-            for (const [word, [, [temp]]] of Object.entries(tmp)) {
-                similarities.set(word, temp/100);
-            }
-            tried_words = Object.keys(tmp).length;
-        }
-
-        return await pyodide.runPython(`
-sim_dict = similarities.to_py()
-next_word_to_try()
-`);
-    }
-
     function sleep(delay) {
         return new Promise(resolve => setTimeout(resolve, delay));
     }
@@ -157,15 +137,6 @@ next_word_to_try()
         }
     }
 
-    // This function is called while the 'Joker!' button is active
-    async function jokerTime() {
-        while (document.getElementById("button3").innerHTML == processingStr) {
-            let output = await getWord();
-            await tryWord(output);
-            //delete(output); KO in strict mode
-        }
-    }
-
     // This function is called when the 'Joker!' button is clicked on
     function toggleButton() {
         const element = document.getElementById("button3");
@@ -173,7 +144,29 @@ next_word_to_try()
             element.innerHTML = processingStr;
             //console.time('joker');
             startTime = Date.now();
-            jokerTime();
+            // This function is called while the 'Joker!' button is active
+            (async function () {
+                while (document.getElementById("button3").innerHTML == processingStr) {
+                    // getNextWord: XXX: Get rid of this conversion?
+                    const tmp = JSON.parse(localStorage.getItem("guesses"));
+
+                    // Update the similarities (words) map if the user has added some
+                    if (tmp != null && tried_words != Object.keys(tmp).length) {
+                        similarities.clear();
+                        // `[word, [try_number, [temp, 1000_closeness]], ...]` -> `word:temp, ...`
+                        for (const [word, [, [temp]]] of Object.entries(tmp)) {
+                            similarities.set(word, temp/100);
+                        }
+                        tried_words = Object.keys(tmp).length;
+                    }
+
+                    let output = await pyodide.runPython(`
+sim_dict = similarities.to_py()
+next_word_to_try()
+`);
+                    await tryWord(output);
+                }
+            })();
             element.classList.toggle("button--loading");
         } else if (element.innerHTML == processingStr) {
             element.innerHTML = jokerStr;
@@ -257,13 +250,6 @@ def next_word_to_try():
         });
     }
 
-    // Add the CSS for the 'Joker!' button
-    function injectCSS() {
-        const style = document.createElement("style");
-        style.innerHTML = '#button3{position:relative;padding:8px 16px;color-scheme:dark;border:none;outline:none;border-radius:2px;cursor:pointer;float:left}#button3:active{background:red}.button__text{font:bold 20px san-serif;transition:all 0.2s}.button--loading .button__text{opacity:0.4}.button--loading::after{content:"";position:absolute;width:16px;height:16px;top:0;left:0;right:0;bottom:0;margin:auto;border:4px solid transparent;border-top-color:#ffffff;border-radius:50%;animation:button-loading-spinner 1s ease infinite}@keyframes button-loading-spinner{from{transform:rotate(0turn)}to{transform:rotate(1turn)}}'
-        document.getElementsByTagName("head")[0].appendChild(style);
-    }
-
     // Add a 'Joker!' button if needed
     async function addButton() {
         const cemant_form = 'form';
@@ -272,7 +258,11 @@ def next_word_to_try():
         }
         // only add the button if the word of the day has not yet been found
         if (localStorage.secret === undefined) {
-            injectCSS();
+            // Add the CSS for the 'Joker!' button
+            const style = document.createElement("style");
+            style.innerHTML = '#button3{position:relative;padding:8px 16px;color-scheme:dark;border:none;outline:none;border-radius:2px;cursor:pointer;float:left}#button3:active{background:red}.button__text{font:bold 20px san-serif;transition:all 0.2s}.button--loading .button__text{opacity:0.4}.button--loading::after{content:"";position:absolute;width:16px;height:16px;top:0;left:0;right:0;bottom:0;margin:auto;border:4px solid transparent;border-top-color:#ffffff;border-radius:50%;animation:button-loading-spinner 1s ease infinite}@keyframes button-loading-spinner{from{transform:rotate(0turn)}to{transform:rotate(1turn)}}'
+            document.getElementsByTagName("head")[0].appendChild(style);
+            // Add the HTML code for the button
             document.getElementById(cemant_form).insertAdjacentHTML('beforebegin', '<button id="button3">' + waitStr + '</button>');
             await loadPythonModel();
         }
