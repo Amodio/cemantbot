@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Cemantix/Cemantle bot
 // @namespace    https://github.com/Amodio
-// @version      2025-04-23.1
+// @version      2025-04-24
 // @description  Bot for Cemantix/Cemantle word games
 // @author       Amodio
 // @match        https://cemantix.certitudes.org/*
