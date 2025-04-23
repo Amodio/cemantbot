@@ -2,9 +2,9 @@
 Bot for a web game where you have to guess a word each day (FR + EN).
 
 ## Installation
-1) Activate the [developper mode in Chrome](https://www.tampermonkey.net/faq.php#Q209)
-2) Install the [Tampermonkey browser extension](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
-3) Add this [userscript](https://github.com/Amodio/cemantbot/raw/refs/heads/main/cemantbot_tampermonkey.user.js). If TamperMonkey does not let you install the script by clicking on the previous link, in the TamperMonkey extension menu go to the Dashboard > Utilities > Import from an URL and paste the previous URL.
+1) Activate the [developper mode in Chrome](https://www.tampermonkey.net/faq.php#Q209).
+2) Install the [Tampermonkey browser extension](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo).
+3) Add this [userscript](https://github.com/Amodio/cemantbot/raw/refs/heads/main/cemantbot_tampermonkey.user.js). If TamperMonkey does not let you install the script by clicking on the previous link, in the TamperMonkey extension menu go to the `Dashboard > Utilities > Import from an URL` and paste the previous URL.
 
 If paranoid, you may want to restrict its access to: `https://*.certitudes.org/*` & `https://raw.githubusercontent.com/*`
 
