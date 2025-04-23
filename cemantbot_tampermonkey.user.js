@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 (function() {
-    //'use strict';
+    'use strict';
     const myTimeout = 30; // Time (milliseconds) to wait between each try
     let startTime = 0;
     let durationTime = 0;
@@ -162,7 +162,7 @@ next_word_to_try()
         while (document.getElementById("button3").innerHTML == processingStr) {
             let output = await getWord();
             await tryWord(output);
-            delete(output);
+            //delete(output); KO in strict mode
         }
     }
 
@@ -225,27 +225,25 @@ with open(model_name, 'wb') as fh:
 model = KeyedVectors.load_word2vec_format(model_name, binary=True, unicode_errors='ignore')
 tested_words = []
 
-# Approximate Nearest Neighbor (ANN) Search
-def estimate_vector():
-    estimated_vec = np.zeros(model.vector_size)
-    # Build our search/estimated vector only with the 5 best (closest) words
-    cut_dict = dict(sorted(sim_dict.items(), key=lambda item: item[1])[:5])
-    for word, sim in cut_dict.items():
-        estimated_vec += sim * model[word]
-    return estimated_vec / np.linalg.norm(estimated_vec)
-
-# Returns the next word to try, based on the similarity of the one(s) tried
 def next_word_to_try():
-    # Return a random word if none was tried yet
+    # 0. First word: totally random
     if len(sim_dict) == 0:
         ret = model.index_to_key[secrets.randbelow(len(model))]
         tested_words.append(ret)
         return ret
-    vec = estimate_vector()
-    for word, sim in model.similar_by_vector(vec, topn=len(sim_dict)+1):
-        if word not in tested_words and word not in sim_dict:
-            tested_words.append(word)
-            return word
+    # 1. Build the coefficient matrix A and vector b (known distances)
+    words = list(sim_dict.keys())
+    A = np.vstack([model[w] for w in words])
+    b = np.array([sim_dict[w] for w in words])
+    # 2. Solve via least squares
+    v, residuals, rank, s = np.linalg.lstsq(A, b, rcond=None)
+    # 3. Normalize for cosine similarity
+    v_norm = v / np.linalg.norm(v)
+    # 4. Find the nearest word in the model
+    for guess_word, similarity in model.similar_by_vector(v_norm, topn=len(sim_dict)+1):
+        if guess_word not in tested_words and guess_word not in sim_dict:
+            tested_words.append(guess_word)
+            return guess_word
     raise ValueError('no word found')
 `);
         console.timeEnd('loadPythonModel: load downloaded model (~3s)');
