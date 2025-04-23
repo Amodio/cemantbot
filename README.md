@@ -22,10 +22,10 @@ It takes about 6 sec to load (more at the first time to cache the binary model).
 ![Cemantle in 6 attempts](https://raw.githubusercontent.com/Amodio/cemantix/main/CEMANTLE/images/cemantle_6_attempts.png "Cemantle in 6 attempts")
 
 ## Description
-The algorithm now uses dot‐product (scalar product) scores to recover the secret word's vector embedding v by:
-1. assembling a small linear system with known query‐word vectors (b<sub>i</sub> =⟨v,w<sub>i</sub>⟩ where w<sub>i</sub> are the known Word2Vec distances to the secret word)
-2. solving for v the least‐squares (as A is non-square, otherwise we would have to have tested the dimension of the model words: d=300) solution minimizing ‖A v − b‖₂
-3. finding the nearest neighbor in the Gensim/word2vec model and trying it
+The algorithm now uses dot-product (scalar product) scores to recover the secret word's vector embedding v by:
+1. assembling a small linear system with known query-word vectors (b<sub>i</sub> =⟨v,w<sub>i</sub>⟩ where w<sub>i</sub> are the known Word2Vec distances to the secret word),
+2. solving for v the least-squares solution minimizing ‖A v − b‖₂,
+3. finding the nearest neighbor for v in the Gensim/word2vec model and trying it,
 4. restarting until the secret word is found.
 
 ## Notes
