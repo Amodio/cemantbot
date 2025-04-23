@@ -240,7 +240,7 @@ def next_word_to_try():
     # 3. Normalize for cosine similarity
     v_norm = v / np.linalg.norm(v)
     # 4. Find the nearest word in the model
-    for guess_word, similarity in model.similar_by_vector(v_norm, topn=len(sim_dict)+1):
+    for guess_word, similarity in model.similar_by_vector(v_norm, topn=len(sim_dict)+len(tested_words)+1):
         if guess_word not in tested_words and guess_word not in sim_dict:
             tested_words.append(guess_word)
             return guess_word
