@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Cemantix/Cemantle bot
 // @namespace    https://github.com/Amodio
-// @version      2025-04-24.1
+// @version      2025-04-25
 // @description  Bot for Cemantix/Cemantle word games
 // @author       Amodio
 // @match        https://cemantix.certitudes.org/*
@@ -162,7 +162,7 @@
 
                     let output = await pyodide.runPython(`
 sim_dict = similarities.to_py()
-next_word_to_try()
+master_guesser()
 `);
                     await tryWord(output);
                 }
@@ -216,14 +216,11 @@ with open(model_name, 'wb') as fh:
     js.document.head.contents.to_file(fh)
 
 model = KeyedVectors.load_word2vec_format(model_name, binary=True, unicode_errors='ignore')
+guess_words = []
 tested_words = []
 
+# Fallback method using least squares
 def next_word_to_try():
-    # 0. First word: totally random
-    if len(sim_dict) == 0:
-        ret = model.index_to_key[secrets.randbelow(len(model))]
-        tested_words.append(ret)
-        return ret
     # 1. Build the coefficient matrix A and vector b (known distances)
     words = list(sim_dict.keys())
     A = np.vstack([model[w] for w in words])
@@ -237,7 +234,66 @@ def next_word_to_try():
         if guess_word not in tested_words and guess_word not in sim_dict:
             tested_words.append(guess_word)
             return guess_word
+    # Should never be reached
     raise ValueError('no word found')
+
+# Get the closest/best candidate word to try
+def guess_da_magic_word(tried_word, cosine_distance):
+    tmp_dict = {}
+    epsylon = 1e-4 # With our models, this is big enough :)
+    lower_boundary = cosine_distance - epsylon
+    upper_boundary = cosine_distance + epsylon
+    for word in model.index_to_key:
+         sim = model.similarity(word, tried_word)
+         if lower_boundary <= sim <= upper_boundary:
+            tmp_dict[word] = abs(cosine_distance - sim) # store the delta to sort the map
+    sorted_dict = dict(sorted(tmp_dict.items(), key=lambda x: x[1], reverse=False))
+    guess_words.append(list(sorted_dict.keys()))
+    # Returns the closest untested word
+    for w in sorted_dict:
+        if w not in tested_words:
+            return w
+    return ''
+
+# Get the most frequent word appearing close to the solution
+def _most_frequent_word():
+    word_counts = {}
+    for sublist in guess_words:
+        for word in sublist:
+            word_counts[word] = word_counts.get(word, 0) + 1
+    sorted_word_counts = dict(sorted(word_counts.items(), key=lambda x: x[1], reverse=True))
+    for w in sorted_word_counts:
+        if w not in tested_words:
+            return w
+    return ''
+
+# Function called by the javascript code
+def master_guesser():
+    # 1. First word: totally random as not detectable + user can try anything
+    # O(1)
+    if len(sim_dict) == 0:
+        ret = model.index_to_key[secrets.randbelow(len(model))]
+    # 2. Try the closest call given the cosine distance the server/oracle gives
+    # O(n)
+    elif len(sim_dict) == 1:
+        w = next(iter(sim_dict))
+        ret = guess_da_magic_word(w, sim_dict[w])
+    # 3. Try the most appearing word in each closest candidates
+	# O(n*tested_words)
+    else:
+        # Update our map of the closest/best candidates
+        for w in sim_dict:
+            if w not in tested_words:
+                tested_words.append(w)
+                guess_da_magic_word(w, sim_dict[w])
+        # Most frequent word in the candidates
+        ret = _most_frequent_word()
+    # This should not happen but.. just in case our chosen epsylon was too small
+    # O(n)
+    if ret == '':
+        return next_word_to_try()
+    tested_words.append(ret)
+    return ret
 `);
         console.timeEnd('loadPythonModel: load downloaded model (~3s)');
         delete(document.head.contents);
