@@ -24,9 +24,9 @@ It takes about 6 sec to load (more at the first time to cache the binary model).
 ## Description
 The main algorithm is now drastically improved, it should **find the secret word in ~3 attempts and in ~5 seconds** :)
 
-It basically bruteforces the cosine distance (temperature) for every tried words and select the closest candidate.
+It basically bruteforces the cosine distance (temperature) for every tried words and selects the closest candidate.
 
-The fallback algorithm uses dot-product (scalar product) scores to converge to the secret word's vector embedding v by:
+The fallback algorithm (that should never be reached anyways) uses dot-product (scalar product) scores to converge to the secret word's vector embedding v by:
 1. assembling a small linear system with known query-word vectors (b<sub>i</sub> =⟨v,w<sub>i</sub>⟩ where w<sub>i</sub> are the known Word2Vec distances to the secret word),
 2. solving for v the least-squares solution minimizing ‖A v − b‖₂,
 3. finding the nearest neighbor for v in the Gensim/word2vec model and trying it,
