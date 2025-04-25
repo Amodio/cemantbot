@@ -23,6 +23,7 @@ It takes about 6 sec to load (more at the first time to cache the binary model).
 
 ## Description
 The main algorithm is now drastically improved, it should **find the secret word in 3 attempts and less than 5 seconds** :)
+You can either try yourself the first two attemps, or let the bot fully do it.
 
 It basically bruteforces the cosine distance (temperature) for every tried words and selects the closest candidate.
 
