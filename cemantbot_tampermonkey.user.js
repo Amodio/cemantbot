@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Cemantix/Cemantle bot
 // @namespace    https://github.com/Amodio
-// @version      2025-04-25
+// @version      2025-04-25.1
 // @description  Bot for Cemantix/Cemantle word games
 // @author       Amodio
 // @match        https://cemantix.certitudes.org/*
@@ -220,7 +220,8 @@ guess_words = []
 tested_words = []
 
 # Fallback method using least squares
-def next_word_to_try():
+def _next_word_to_try():
+    print("[INFO] We have used the fallback method...")
     # 1. Build the coefficient matrix A and vector b (known distances)
     words = list(sim_dict.keys())
     A = np.vstack([model[w] for w in words])
@@ -238,7 +239,7 @@ def next_word_to_try():
     raise ValueError('no word found')
 
 # Get the closest/best candidate word to try
-def guess_da_magic_word(tried_word, cosine_distance):
+def _guess_da_magic_word(tried_word, cosine_distance):
     tmp_dict = {}
     epsylon = 1e-4 # With our models, this is big enough :)
     lower_boundary = cosine_distance - epsylon
@@ -248,26 +249,46 @@ def guess_da_magic_word(tried_word, cosine_distance):
          if lower_boundary <= sim <= upper_boundary:
             tmp_dict[word] = abs(cosine_distance - sim) # store the delta to sort the map
     sorted_dict = dict(sorted(tmp_dict.items(), key=lambda x: x[1], reverse=False))
-    guess_words.append(list(sorted_dict.keys()))
+    guess_words.append(sorted_dict)
     # Returns the closest untested word
     for w in sorted_dict:
         if w not in tested_words:
             return w
     return ''
 
-# Get the most frequent word appearing close to the solution
-def _most_frequent_word():
-    word_counts = {}
+def _mean_value(word):
+    ret = 0.0
+    n = 0
     for sublist in guess_words:
-        for word in sublist:
-            word_counts[word] = word_counts.get(word, 0) + 1
-    sorted_word_counts = dict(sorted(word_counts.items(), key=lambda x: x[1], reverse=True))
-    for w in sorted_word_counts:
-        if w not in tested_words:
-            return w
-    return ''
+        for w in sublist:
+            if w == word:
+                ret += sublist[w]
+                n += 1
+    return ret / n
 
-# Function called by the javascript code
+
+# Get the most frequent word appearing close to the solution
+def _best_most_frequent_word():
+    word_counts = {}
+    max_occurrence = 0
+    # Create the frequency map and get the max occurrence of any word
+    for sublist in guess_words:
+        for w in sublist:
+            word_counts[w] = word_counts.get(w, 0) + 1
+            if word_counts[w] > max_occurrence:
+                max_occurrence = word_counts[w]
+    # For the candidates appearing the most, return the closest one
+    delta = 31337
+    ret = ''
+    for sublist in guess_words:
+        for w in sublist:
+            if word_counts[w] == max_occurrence and w not in tested_words:
+                meanv = _mean_value(w)
+                if delta > meanv:
+                    delta = meanv
+                    ret = w
+    return ret
+
 def master_guesser():
     # 1. First word: totally random as not detectable + user can try anything
     # O(1)
@@ -277,22 +298,22 @@ def master_guesser():
     # O(n)
     elif len(sim_dict) == 1:
         w = next(iter(sim_dict))
-        ret = guess_da_magic_word(w, sim_dict[w])
-    # 3. Try the most appearing word in each closest candidates
+        tested_words.append(w)
+        ret = _guess_da_magic_word(w, sim_dict[w])
+    # 3. Try the most appearing and closest word for each candidates
 	# O(n*tested_words)
     else:
         # Update our map of the closest/best candidates
         for w in sim_dict:
             if w not in tested_words:
                 tested_words.append(w)
-                guess_da_magic_word(w, sim_dict[w])
+                _guess_da_magic_word(w, sim_dict[w])
         # Most frequent word in the candidates
-        ret = _most_frequent_word()
+        ret = _best_most_frequent_word()
     # This should not happen but.. just in case our chosen epsylon was too small
     # O(n)
     if ret == '':
-        return next_word_to_try()
-    tested_words.append(ret)
+        return _next_word_to_try()
     return ret
 `);
         console.timeEnd('loadPythonModel: load downloaded model (~3s)');
