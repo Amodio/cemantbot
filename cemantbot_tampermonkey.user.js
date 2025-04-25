@@ -241,9 +241,9 @@ def _next_word_to_try():
 # Get the closest/best candidate word to try
 def _guess_da_magic_word(tried_word, cosine_distance):
     tmp_dict = {}
-    epsylon = 1e-4 # With our models, this is big enough :)
-    lower_boundary = cosine_distance - epsylon
-    upper_boundary = cosine_distance + epsylon
+    epsilon = 1e-4 # With our models, this is big enough :)
+    lower_boundary = cosine_distance - epsilon
+    upper_boundary = cosine_distance + epsilon
     for word in model.index_to_key:
          sim = model.similarity(word, tried_word)
          if lower_boundary <= sim <= upper_boundary:
@@ -310,7 +310,7 @@ def master_guesser():
                 _guess_da_magic_word(w, sim_dict[w])
         # Most frequent word in the candidates
         ret = _best_most_frequent_word()
-    # This should not happen but.. just in case our chosen epsylon was too small
+    # This should not happen but.. just in case our chosen epsilon was too small
     # O(n)
     if ret == '':
         return _next_word_to_try()
