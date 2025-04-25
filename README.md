@@ -22,7 +22,7 @@ It takes about 6 sec to load (more at the first time to cache the binary model).
 ![Cemantle in 6 attempts](https://raw.githubusercontent.com/Amodio/cemantix/main/CEMANTLE/images/cemantle_6_attempts.png "Cemantle in 6 attempts")
 
 ## Description
-The main algorithm is now drastically improved, it should **find the secret word in ~3 attempts and in ~5 seconds** :)
+The main algorithm is now drastically improved, it should **find the secret word in 3 words and less than 5 seconds** :)
 
 It basically bruteforces the cosine distance (temperature) for every tried words and selects the closest candidate.
 
