@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Cemantix/Cemantle bot
 // @namespace    https://github.com/Amodio
-// @version      2025-04-25.1
+// @version      2025-04-26
 // @description  Bot for Cemantix/Cemantle word games
 // @author       Amodio
 // @match        https://cemantix.certitudes.org/*
@@ -85,7 +85,7 @@
                             newScript.setAttribute('data-app', savedDataApp);
                             document.querySelector('head').appendChild(newScript);
                             // Finally, inject our code :)
-                            injectScript('https://cdn.jsdelivr.net/pyodide/v0.27.2/full/pyodide.js', addButton);
+                            injectScript('https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js', addButton);
                         }
                     });
                 }
