@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Cemantix/Cemantle bot
 // @namespace    https://github.com/Amodio
-// @version      2025-04-26
+// @version      2025-04-27
 // @description  Bot for Cemantix/Cemantle word games
 // @author       Amodio
 // @match        https://cemantix.certitudes.org/*
@@ -303,11 +303,13 @@ def master_guesser():
     # 3. Try the most appearing and closest word for each candidates
 	# O(n*tested_words)
     else:
+        # As time to solve is proportional to the tried words, limit them to 2
+        cut_sim_dict = dict(list(sim_dict.items())[:2])
         # Update our map of the closest/best candidates
-        for w in sim_dict:
+        for w in cut_sim_dict:
             if w not in tested_words:
                 tested_words.append(w)
-                _guess_da_magic_word(w, sim_dict[w])
+                _guess_da_magic_word(w, cut_sim_dict[w])
         # Most frequent word in the candidates
         ret = _best_most_frequent_word()
     # This should not happen but.. just in case our chosen epsilon was too small
