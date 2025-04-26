@@ -10,10 +10,10 @@ If paranoid, you may want to restrict its access to: `https://*.certitudes.org/*
 
 ## Usage
 * Go to https://cemantix.certitudes.org or https://cemantle.certitudes.org
-* Make sure the 'Joker!' button is here, otherwise refresh the page.
+* Make sure the 'Joker!' button is loaded, otherwise refresh the page.
 
 It takes about 6 sec to load (more at the first time to cache the binary model).
-* Click the 'Joker!' button and enjoy!
+* Click the 'Joker!' button, enjoy!
 
 ![Joker button](https://raw.githubusercontent.com/Amodio/cemantix/main/images/joker_btn.png "Joker button")
 
@@ -23,9 +23,9 @@ It takes about 6 sec to load (more at the first time to cache the binary model).
 
 ## Description
 The main algorithm is now drastically improved: it should **find the secret word in 3 attempts/words and less than 5 seconds** :)
-You can either set the first two words yourself, or let the bot randomly choose the first one and continue.
+You can either try the first two words yourself, or let the bot randomly choose the first one and continue.
 
-It basically bruteforces the cosine distance (temperature) for every tried words and selects the closest candidate.
+It basically bruteforces the cosine distance (temperature) for every tried word and selects the closest candidate.
 
 The fallback algorithm (that should never be reached anyways) uses dot-product (scalar product) scores to converge to the secret word's vector embedding v by:
 1. assembling a small linear system with known query-word vectors (b<sub>i</sub> =⟨v,w<sub>i</sub>⟩ where w<sub>i</sub> are the known Word2Vec distances to the secret word),
