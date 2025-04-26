@@ -22,8 +22,8 @@ It takes about 6 sec to load (more at the first time to cache the binary model).
 ![Cemantle in 6 attempts](https://raw.githubusercontent.com/Amodio/cemantix/main/CEMANTLE/images/cemantle_6_attempts.png "Cemantle in 6 attempts")
 
 ## Description
-The main algorithm is now drastically improved, it should **find the secret word in 3 attempts and less than 5 seconds** :)
-You can either try yourself the first two attemps, or let the bot fully do it.
+The main algorithm is now drastically improved: it should **find the secret word in 3 attempts/words and less than 5 seconds** :)
+You can either set the first two words yourself, or let the bot randomly choose the first one and continue.
 
 It basically bruteforces the cosine distance (temperature) for every tried words and selects the closest candidate.
 
@@ -38,6 +38,6 @@ Models from [Jean-Philippe Fauconnier](https://fauconnier.github.io) and [Google
 
 I have tested _55402_ [FR words](https://raw.githubusercontent.com/Amodio/cemantix/main/wordlist.txt "FR words") for this game even if some do not exist in French; _46212_ [EN words](https://raw.githubusercontent.com/Amodio/cemantix/main/wordlist.txt "EN words") for Cemantle. Check [benchmark.txt](https://raw.githubusercontent.com/Amodio/cemantix/main/benchmark/benchmark.txt) or [benchmark.txt](https://raw.githubusercontent.com/Amodio/cemantix/main/CEMANTLE/benchmark/benchmark.txt) (Cemantle) to see how similar our models are: ~97% for Cémantix and 100% for Cemantle.
 
-The author has added protections client-side to make this bot useless, but as long as the model was published, there is no use as the bot could fully run in WASM (or outside the browser) one day :)
+The author has added protections client-side to make this bot useless, but as long as the model was published, there is no use as the bot could fully run in WASM (or outside the browser) one day (eventually storing the result by solving it daily with github actions) :)
 
 Thanks to [vivien7806](https://github.com/vivien7806 "vivien7806") for the great help!
