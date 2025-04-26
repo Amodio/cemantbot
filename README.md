@@ -3,16 +3,14 @@ Bot for a web game where you have to guess a word each day (FR + EN).
 
 ## Installation
 1) Activate the [developper mode in Chrome](https://www.tampermonkey.net/faq.php#Q209) and install the [Tampermonkey browser extension](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo).
-2) Click on [userscript](https://github.com/Amodio/cemantbot/raw/refs/heads/main/cemantbot_tampermonkey.user.js) to install. If TamperMonkey does launch, in its extension menu go to the `Dashboard > Utilities > Import from an URL` and paste the previous URL.
+2) Click on [userscript](https://github.com/Amodio/cemantbot/raw/refs/heads/main/cemantbot_tampermonkey.user.js) to install. If TamperMonkey does launch, paste the previous URL into: `Dashboard > Utilities > Import from an URL`.
 
-If paranoid, you may want to restrict its access to: `https://*.certitudes.org/*` & `https://raw.githubusercontent.com/*`
+If paranoid, you may want to restrict TamperMonkey's access only to: `https://*.certitudes.org/*` & `https://raw.githubusercontent.com/*`.
 
 ## Usage
-1) Go to https://cemantix.certitudes.org or https://cemantle.certitudes.org
-2) Make sure the 'Joker!' button is loaded, otherwise refresh the page.
-
-It takes about 6 sec to load (more at the first time to cache the binary model).
-3) Click the 'Joker!' button, enjoy!
+* Go to https://cemantix.certitudes.org or https://cemantle.certitudes.org
+* Make sure the 'Joker!' button is loaded, otherwise refresh the page (takes ~6 sec to load, more at first to cache the binary model).
+* Click the 'Joker!' button, enjoy!
 
 ![Joker button](https://raw.githubusercontent.com/Amodio/cemantix/main/images/joker_btn.png "Joker button")
 
