@@ -5,3 +5,5 @@ models/*
 CEMANTLE/benchmark/results/*
 !CEMANTLE/benchmark/results/.gitkeep
 CEMANTLE/models/GoogleNews-vectors-negative300.bin
+cemantix_soluce
+cemantle_soluce
