@@ -9,7 +9,7 @@ If paranoid, you may want to restrict TamperMonkey's access only to: `https://*.
 
 ## Usage
 * Go to https://cemantix.certitudes.org or https://cemantle.certitudes.org
-* Make sure the 'Joker!' button is loaded, otherwise refresh the page (takes ~6 sec to load, more at first to cache the binary model).
+* Make sure the 'Joker!' button is loaded, otherwise refresh the page (takes ~6 sec to fully load, more at first to cache the binary model).
 * Click the 'Joker!' button, enjoy!
 
 ![Joker button](https://raw.githubusercontent.com/Amodio/cemantix/main/images/joker_btn.png "Joker button")
@@ -30,11 +30,20 @@ The fallback algorithm (that should never be reached anyways) uses dot-product (
 3. finding the nearest neighbor for v in the Gensim/word2vec model and trying it,
 4. restarting until the secret word is found.
 
+## Standalone script
+```
+git clone https://github.com/Amodio/cemantbot.git
+cd cemantbot/
+pip -r requirements.txt
+./cemantbot.py # add any argument to solve Cemantle instead of Cémantix
+```
+
 ## Notes
 Models from [Jean-Philippe Fauconnier](https://fauconnier.github.io) and [Google](https://code.google.com/archive/p/word2vec/) (for Cemantle).
 
-I have tested _55402_ [FR words](https://raw.githubusercontent.com/Amodio/cemantix/main/wordlist.txt "FR words") for this game even if some do not exist in French; _46212_ [EN words](https://raw.githubusercontent.com/Amodio/cemantix/main/wordlist.txt "EN words") for Cemantle. Check [benchmark.txt](https://raw.githubusercontent.com/Amodio/cemantix/main/benchmark/benchmark.txt) or [benchmark.txt](https://raw.githubusercontent.com/Amodio/cemantix/main/CEMANTLE/benchmark/benchmark.txt) (Cemantle) to see how similar our models are: ~97% for Cémantix and 100% for Cemantle.
+I have tested _55402_ valid words on Cémantix (even if some do not exist in French); _46212_ for Cemantle.
+There's a 100% match between the model I have stripped from Google and the one used by Cemantle; 97% for Cémantix (I might rewrite the code for stripping models, as accents were a problem).
 
-The author has added protections client-side to make this bot useless, but as long as the model was published, there is no use as the bot could fully run in WASM (or outside the browser) one day (eventually storing the result by solving it daily with github actions) :)
+The author has added protections client-side to make this bot useless (suspicious timing), so there's a standalone version of the bot now (just in case more protections were added).
 
 Thanks to [vivien7806](https://github.com/vivien7806 "vivien7806") for the great help!
