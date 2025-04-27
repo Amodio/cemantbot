@@ -8,7 +8,6 @@ import secrets
 import asyncio
 import aiohttp
 import numpy as np
-from collections.abc import Callable
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from gensim.models import KeyedVectors
@@ -32,21 +31,21 @@ def load_soluce(game: str, day: int):
         return None
     with open(path, 'r', encoding='utf-8') as f:
         for line in f:
-            dayn, word, people, attempts, elapsed = line.strip().split()
+            dayn, word, validations, attempts, elapsed = line.strip().split()
             if int(dayn) == day:
                 return {
                     'word': word,
-                    'people': int(people),
+                    'validations': int(validations),
                     'attempts': int(attempts),
                     'elapsed': float(elapsed)
                 }
     return None
 
 # Save solution to file
-def save_soluce(game: str, day: int, word: str, people: int, attempts: int, elapsed: float):
+def save_soluce(game: str, day: int, word: str, validations: int, attempts: int, elapsed: float):
     path = os.path.join(SOLUCE_DIR, f"{game}_soluce")
     with open(path, 'w', encoding='utf-8') as f:
-        f.write(f"{day} {word} {people} {attempts} {elapsed:.2f}")
+        f.write(f"{day} {word} {validations} {attempts} {elapsed:.2f}")
 
 # Class for efficient similarity computations
 class SimilaritySolver:
@@ -88,20 +87,18 @@ async def fetch_score(session, url: str, origin: str, word: str) -> tuple[float,
         return float(data['s']), int(data['v'])
 
 # Main solving function
-async def solve(game: str, model_path: str, day_fn: Callable):
-    day = day_fn()
+async def solve(game: str, model_path: str, day: int):
     origin = f"https://{game}.certitudes.org"
     cached = load_soluce(game, day)
     if cached:
-        print(f"Cached: {cached['word']} found after {cached['people']} people in {cached['attempts']} attempts ({cached['elapsed']}s)")
+        print(f"Cached: {cached['word']} found after {cached['validations']} validations in {cached['attempts']} attempts ({cached['elapsed']}s)")
         return
 
-    print('Loading model...', end=' ')
     start_time = time.time()
+    print('Loading model...', end=' ')
+    url = f"{origin}/score?n={day}"
     model = KeyedVectors.load_word2vec_format(model_path, binary=True, unicode_errors='ignore')
     solver = SimilaritySolver(model)
-    url = f"{origin}/score?n={day}"
-
     rng = secrets.SystemRandom(RANDOM_SEED)
     tried_words = []
     counts = {}
@@ -128,7 +125,7 @@ async def solve(game: str, model_path: str, day_fn: Callable):
                 if s == 1.0:
                     elapsed = time.time() - start_time
                     save_soluce(game, day, best, v, len(tried_words), elapsed)
-                    print(f"{datetime.now()} {best} found after {v} people in {len(tried_words)} attempts ({elapsed:.2f}s)")
+                    print(f"{datetime.now()} {best} found after {v} validations in {len(tried_words)} attempts ({elapsed:.2f}s)")
                     return
                 candidates = solver.candidates(best, s)
                 for candidate in candidates:
@@ -149,12 +146,12 @@ if __name__ == '__main__':
         config = (
             'cemantix',
             './models/frWac_no_postag_phrase_500_cbow_cut10_stripped.bin',
-            day_number_cemantix
+            day_number_cemantix()
         )
     else:
         config = (
             'cemantle',
             './CEMANTLE/models/GoogleNews-vectors-negative300_stripped.bin',
-            day_number_cemantle
+            day_number_cemantle()
         )
     asyncio.run(solve(*config))
