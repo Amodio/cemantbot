@@ -104,11 +104,10 @@ def print_result(word: str, validations: int, attempts: int, elapsed: float, cac
     print(f"in {attempts} attempts ({elapsed:.2f}s).")
 
 # Main solving function
-async def solve(game: str, model: KeyedVectors, day: int, auto_retry: bool = True):
+async def solve(game: str, solver: SimilaritySolver, day: int, auto_retry: bool = True):
     start_time = time.time()
     origin = f"https://{game}.certitudes.org"
     url = f"{origin}/score?n={day}"
-    solver = SimilaritySolver(model)
     rng = secrets.SystemRandom(RANDOM_SEED)
     tried_words = []
     counts = {}
@@ -174,10 +173,11 @@ def main():
     start_time = time.time()
     print(f"Loading model for {game}...", end=' ')
     model = KeyedVectors.load_word2vec_format(model_path, binary=True, unicode_errors='ignore')
+    solver = SimilaritySolver(model)
     print(f"({(time.time() - start_time) * 1000:.2f} ms)")
 
     # Start solving the game
-    asyncio.run(solve(game, model, day))
+    asyncio.run(solve(game, solver, day))
 
 if __name__ == '__main__':
     main()
