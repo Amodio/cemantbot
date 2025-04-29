@@ -12,16 +12,38 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from gensim.models import KeyedVectors
 
-# Configuration
-SOLUCE_DIR = '.'  # Directory to store solution files
-RANDOM_SEED = 42  # Seed for reproducibility
+SOLUCE_DIR = '.'    # Directory to store the solution files
+RANDOM_SEED = 42    # Seed for reproducibility
 
-# Calculate the day number for Cémantix
-def day_number_cemantix() -> int:
-    return (datetime.now(ZoneInfo('Europe/Paris')).date() - datetime(2022, 3, 2).date()).days
+# Class for efficient similarity computations
+class SimilaritySolver:
+    # O(n): Load words of the model with their vectors
+    def __init__(self, model: KeyedVectors):
+        self.vocab = model.index_to_key # words
+        self.vectors = model.get_normed_vectors()
+        # Lookup index: map each word of the model to its index
+        self.word2idx = {word: idx for idx, word in enumerate(self.vocab)}
 
-# Calculate the day number for Cemantle
-def day_number_cemantle() -> int:
+    # O(n*D) {D=embedding dim}: Get the words whose cosine similarity to a given target_word are the closest
+    def candidates(self, target_word: str, similarity: float) -> dict[str, float]:
+        idx = self.word2idx.get(target_word)
+        if idx is None:
+            return {}
+        vec = self.vectors[idx] # vector of the target_word
+        # O(n*D): dot product between the target vector and all the normalized vectors of the model
+        sims = np.dot(self.vectors, vec)
+        # O(n): Mask the words/vectors where |cosine_distance[i] – cosine_distance| ≤ espilon
+        mask = np.abs(sims - similarity) <= 1e-4 # this epsilon is great for our models and the precision we r given :>
+        idxs = np.where(mask)[0]
+        return {
+            self.vocab[i]: abs(sims[i] - similarity)
+            for i in idxs if i != idx
+        }
+
+# Calculate the day number of the given game
+def day_number(game: str) -> int:
+    if game == 'cemantix':
+        return (datetime.now(ZoneInfo('Europe/Paris')).date() - datetime(2022, 3, 2).date()).days
     return (datetime.now(ZoneInfo('America/Los_Angeles')).date() - datetime(2022, 4, 4).date()).days
 
 # Load solution from file if it exists
@@ -47,37 +69,17 @@ def save_soluce(game: str, day: int, word: str, validations: int, attempts: int,
     with open(path, 'w', encoding='utf-8') as f:
         f.write(f"{day} {word} {validations} {attempts} {elapsed:.2f}")
 
-# Class for efficient similarity computations
-class SimilaritySolver:
-    def __init__(self, model: KeyedVectors):
-        self.vocab = model.index_to_key
-        self.vectors = model.get_normed_vectors()
-        self.word2idx = {word: idx for idx, word in enumerate(self.vocab)}
-
-    def candidates(self, target_word: str, similarity: float, tol: float = 1e-4) -> dict[str, float]:
-        idx = self.word2idx.get(target_word)
-        if idx is None:
-            return {}
-        vec = self.vectors[idx]
-        sims = np.dot(self.vectors, vec)
-        mask = np.abs(sims - similarity) <= tol
-        idxs = np.where(mask)[0]
-        return {
-            self.vocab[i]: abs(sims[i] - similarity)
-            for i in idxs if i != idx
-        }
-
 # Asynchronous function to fetch score
 async def fetch_score(session, url: str, origin: str, word: str) -> tuple[float, int]:
     headers = {
-        'User-Agent': 'Mozilla/5.0',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
         'Origin': origin,
         'Referer': origin + '/'
     }
     async with session.post(url, headers=headers, data={'word': word}) as response:
         response.raise_for_status()
         data = await response.json()
-        #print('[DBG] Requesting word', word, '->', data)
+        #print('[DBG] Requested word:', word, '->', data)
         if 'r' in data:
             raise ValueError('Invalid day number')
         if 'e' in data:
@@ -86,24 +88,31 @@ async def fetch_score(session, url: str, origin: str, word: str) -> tuple[float,
             raise RuntimeError(f"Invalid response: {data}")
         return float(data['s']), int(data['v'])
 
-# Main solving function
-async def solve(game: str, model_path: str, day: int):
-    origin = f"https://{game}.certitudes.org"
-    cached = load_soluce(game, day)
+# Print the secret word and misc stats
+def print_result(word: str, validations: int, attempts: int, elapsed: float, cached: bool=False):
     if cached:
-        print(f"Cached: {cached['word']} found after {cached['validations']} validations in {cached['attempts']} attempts ({cached['elapsed']}s)")
-        return
+        print('Cached:', end=' ')
+    else:
+        print(datetime.now(), end=' ')
+    print(f"{word} found", end=' ')
+    if validations == 0:
+        print('the first', end=', ')
+    elif validations == 1:
+        print('after 1 validation', end=', ')
+    else:
+        print(f"after {validations} validations", end=', ')
+    print(f"in {attempts} attempts ({elapsed:.2f}s).")
 
+# Main solving function
+async def solve(game: str, model: KeyedVectors, day: int, auto_retry: bool = True):
     start_time = time.time()
-    print('Loading model...', end=' ')
+    origin = f"https://{game}.certitudes.org"
     url = f"{origin}/score?n={day}"
-    model = KeyedVectors.load_word2vec_format(model_path, binary=True, unicode_errors='ignore')
     solver = SimilaritySolver(model)
     rng = secrets.SystemRandom(RANDOM_SEED)
     tried_words = []
     counts = {}
     max_count = 0
-    print(f"({(time.time() - start_time) * 1000:.2f} ms)")
 
     async with aiohttp.ClientSession() as session:
         # Iterative guessing
@@ -120,12 +129,14 @@ async def solve(game: str, model_path: str, day: int):
                 )
                 if not best:
                     best = rng.choice(solver.vocab)
+                    if best in tried_words:
+                        continue
                 tried_words.append(best)
                 s, v = await fetch_score(session, url, origin, best)
                 if s == 1.0:
                     elapsed = time.time() - start_time
                     save_soluce(game, day, best, v, len(tried_words), elapsed)
-                    print(f"{datetime.now()} {best} found after {v} validations in {len(tried_words)} attempts ({elapsed:.2f}s)")
+                    print_result(best, v, len(tried_words), elapsed)
                     return
                 candidates = solver.candidates(best, s)
                 for candidate in candidates:
@@ -134,24 +145,39 @@ async def solve(game: str, model_path: str, day: int):
             except ValueError as err:
                 if str(err) == 'Invalid day number':
                     eprint('[ERR] Invalid day...')
-                    sys.exit(1)
+                    if auto_retry:
+                        return solve(game, model, day + 1, False)
+                    else:
+                        sys.exit(1)
                 elif str(err) == 'Invalid word':
                     # If you see this.. it's time to update your model!
                     eprint('[WARN] Invalid word:', word)
                 else:
                     panic(err)
 
-if __name__ == '__main__':
+def main():
     if len(sys.argv) < 2:
-        config = (
-            'cemantix',
-            './models/frWac_no_postag_phrase_500_cbow_cut10_stripped.bin',
-            day_number_cemantix()
-        )
+        game = 'cemantix'
+        model_path = './models/frWac_no_postag_phrase_500_cbow_cut10_stripped.bin'
     else:
-        config = (
-            'cemantle',
-            './CEMANTLE/models/GoogleNews-vectors-negative300_stripped.bin',
-            day_number_cemantle()
-        )
-    asyncio.run(solve(*config))
+        game = 'cemantle'
+        model_path = './CEMANTLE/models/GoogleNews-vectors-negative300_stripped.bin'
+
+    # If we've already solved the game for today, print the result and exit
+    day = day_number(game)
+    cached = load_soluce(game, day)
+    if cached:
+        print_result(cached['word'], cached['validations'], cached['attempts'], cached['elapsed'], True)
+        return
+
+    # Load the word2vec model (normalized vectors of words)
+    start_time = time.time()
+    print(f"Loading model for {game}...", end=' ')
+    model = KeyedVectors.load_word2vec_format(model_path, binary=True, unicode_errors='ignore')
+    print(f"({(time.time() - start_time) * 1000:.2f} ms)")
+
+    # Start solving the game
+    asyncio.run(solve(game, model, day))
+
+if __name__ == '__main__':
+    main()
