@@ -19,12 +19,12 @@ RANDOM_SEED = 42    # Seed for reproducibility
 class SimilaritySolver:
     # O(n): Load words of the model with their vectors
     def __init__(self, model: KeyedVectors):
-        self.vocab = model.index_to_key # words
-        self.vectors = model.get_normed_vectors()
+        self.vocab: List[str] = model.index_to_key # words
+        self.vectors: np.ndarray = model.get_normed_vectors()
         # Lookup index: map each word of the model to its index
-        self.word2idx = {word: idx for idx, word in enumerate(self.vocab)}
+        self.word2idx: Dict[str, int] = {w: i for i, w in enumerate(self.vocab)}
 
-    # O(n*D) {D=embedding dim}: Get the words whose cosine similarity to a given target_word are the closest
+    # O(n*D) {D=embedding dim}: Get the words whose cosine similarities to a given target_word are the closest
     def candidates(self, target_word: str, similarity: float) -> dict[str, float]:
         idx = self.word2idx.get(target_word)
         if idx is None:
@@ -89,19 +89,19 @@ async def fetch_score(session, url: str, origin: str, word: str) -> tuple[float,
         return float(data['s']), int(data['v'])
 
 # Print the secret word and misc stats
-def print_result(word: str, validations: int, attempts: int, elapsed: float, cached: bool=False):
+def print_result(word: str, day: int, validations: int, attempts: int, elapsed: float, cached: bool=False):
     if cached:
         print('Cached:', end=' ')
     else:
         print(datetime.now(), end=' ')
-    print(f"{word} found", end=' ')
+    print(f"#{day} {word}, found", end=' ')
     if validations == 0:
         print('the first', end=', ')
     elif validations == 1:
-        print('after 1 validation', end=', ')
+        print('after 1 guy', end=' ')
     else:
-        print(f"after {validations} validations", end=', ')
-    print(f"in {attempts} attempts ({elapsed:.2f}s).")
+        print(f"after {validations} prior validations", end=' ')
+    print(f"in {attempts} attempts ({elapsed:.2f} ms).")
 
 # Main solving function
 async def solve(game: str, solver: SimilaritySolver, day: int, auto_retry: bool = True):
@@ -133,9 +133,9 @@ async def solve(game: str, solver: SimilaritySolver, day: int, auto_retry: bool 
                 tried_words.append(best)
                 s, v = await fetch_score(session, url, origin, best)
                 if s == 1.0:
-                    elapsed = time.time() - start_time
+                    elapsed = (time.time() - start_time) * 1000
                     save_soluce(game, day, best, v, len(tried_words), elapsed)
-                    print_result(best, v, len(tried_words), elapsed)
+                    print_result(best, day, v, len(tried_words), elapsed)
                     return
                 candidates = solver.candidates(best, s)
                 for candidate in candidates:
@@ -143,7 +143,7 @@ async def solve(game: str, solver: SimilaritySolver, day: int, auto_retry: bool 
                     max_count = max(max_count, counts[candidate])
             except ValueError as err:
                 if str(err) == 'Invalid day number':
-                    eprint('[ERR] Invalid day...')
+                    eprint('[ERR] Invalid day, retrying...')
                     if auto_retry:
                         return solve(game, model, day + 1, False)
                     else:
@@ -166,7 +166,7 @@ def main():
     day = day_number(game)
     cached = load_soluce(game, day)
     if cached:
-        print_result(cached['word'], cached['validations'], cached['attempts'], cached['elapsed'], True)
+        print_result(cached['word'], day, cached['validations'], cached['attempts'], cached['elapsed'], True)
         return
 
     # Load the word2vec model (normalized vectors of words)
