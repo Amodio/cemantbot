@@ -34,7 +34,10 @@ The fallback algorithm (that should never be reached anyways) uses dot-product (
 ```
 git clone https://github.com/Amodio/cemantbot.git
 cd cemantbot/
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
+chmod +x cemantbot.py
 ./cemantbot.py # add any argument to solve Cemantle instead of Cémantix
 ```
 
