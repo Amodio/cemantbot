@@ -186,7 +186,7 @@ master_guesser()
         await pyodide.loadPackage('gensim');
         console.timeEnd('loadPythonModel: load gensim pkg with Pyodide (~3s)');
         console.time('loadPythonModel: download');
-        const fetchUrl = (window.location.hostname.split('.')[0] == 'cemantix' ? 'https://media.githubusercontent.com/media/Amodio/cemantix/main/models/frWac_no_postag_phrase_500_cbow_cut10_stripped.bin' : 'https://raw.githubusercontent.com/Amodio/cemantix/main/CEMANTLE/models/GoogleNews-vectors-negative300_stripped.bin');
+        const fetchUrl = (window.location.hostname.split('.')[0] == 'cemantix' ? 'https://media.githubusercontent.com/media/Amodio/cemantbot/refs/heads/main/models/frWac_no_postag_phrase_500_cbow_cut10_stripped.bin' : 'https://raw.githubusercontent.com/Amodio/cemantix/main/CEMANTLE/models/GoogleNews-vectors-negative300_stripped.bin');
         let response = await caches.open('cemanbot').then(function(cache) {
             return cache.match('model.bin').then(function(response) {
                 if (response) {
