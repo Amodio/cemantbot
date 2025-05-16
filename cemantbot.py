@@ -13,7 +13,6 @@ from zoneinfo import ZoneInfo
 from gensim.models import KeyedVectors
 
 SOLUCE_DIR = '.'    # Directory to store the solution files
-RANDOM_SEED = 42    # Seed for reproducibility
 
 # Class for efficient similarity computations
 class SimilaritySolver:
@@ -108,7 +107,6 @@ async def solve(game: str, solver: SimilaritySolver, day: int, auto_retry: bool 
     start_time = time.time()
     origin = f"https://{game}.certitudes.org"
     url = f"{origin}/score?n={day}"
-    rng = secrets.SystemRandom(RANDOM_SEED)
     tried_words = []
     counts = {}
     max_count = 0
@@ -127,7 +125,7 @@ async def solve(game: str, solver: SimilaritySolver, day: int, auto_retry: bool 
                     default=None
                 )
                 if not best:
-                    best = rng.choice(solver.vocab)
+                    best = solver.vocab[secrets.randbelow(len(solver.vocab))]
                     if best in tried_words:
                         continue
                 tried_words.append(best)
