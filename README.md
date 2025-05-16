@@ -12,11 +12,11 @@ If paranoid, you may want to restrict TamperMonkey's access only to: `https://*.
 * Make sure the 'Joker!' button is loaded, otherwise refresh the page (takes ~6 sec to fully load, more at first to cache the binary model).
 * Click the 'Joker!' button, enjoy!
 
-![Joker button](https://raw.githubusercontent.com/Amodio/cemantix/main/images/joker_btn.png "Joker button")
+![Joker button](https://raw.githubusercontent.com/Amodio/cemantbot/main/images/joker_btn.png "Joker button")
 
-![First](https://raw.githubusercontent.com/Amodio/cemantix/main/images/1st_17attempts.png "First")
+![First](https://raw.githubusercontent.com/Amodio/cemantbot/main/images/1st_17attempts.png "First")
 
-![Cemantle in 6 attempts](https://raw.githubusercontent.com/Amodio/cemantix/main/CEMANTLE/images/cemantle_6_attempts.png "Cemantle in 6 attempts")
+![Cemantle in 6 attempts](https://raw.githubusercontent.com/Amodio/cemantbot/main/CEMANTLE/images/cemantle_6_attempts.png "Cemantle in 6 attempts")
 
 ## Description
 The main algorithm is now drastically improved: it should **find the secret word in 3 attempts/words and less than 5 seconds** :)
