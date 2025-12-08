@@ -20,7 +20,9 @@ If paranoid on Chrome, you can restrict TamperMonkey's access only to: `https://
 
 ## Description
 The main algorithm is now drastically improved: it should **find the secret word in 3 attempts/words and less than 5 seconds** :)
-You can either try the first two words yourself, or let the bot randomly choose the first one and continue.
+
+The standalone script find answers in **less than a second**.
+You can either try the first two words yourself, or let the bot choose (first word is random).
 
 It basically bruteforces the cosine distance (temperature) for every tried word and selects the closest candidate.
 
