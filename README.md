@@ -35,7 +35,7 @@ The fallback algorithm (that should never be reached anyways) uses dot-product (
 git clone https://github.com/Amodio/cemantbot.git
 cd cemantbot/
 pip3 install aiohttp gensim numpy --break-system-packages # (or use python -m venv cemantbot)
-./cemantbot.py # add any argument to solve Cemantle instead of Cémantix
+python3 ./cemantbot.py # add any argument to solve Cemantle instead of Cémantix
 ```
 
 ## Notes
