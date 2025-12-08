@@ -42,7 +42,7 @@ python3 ./cemantbot.py # add any argument to solve Cemantle instead of Cémantix
 Models from [Jean-Philippe Fauconnier](https://fauconnier.github.io) and [Google](https://code.google.com/archive/p/word2vec/) (for Cemantle).
 
 I have tested _55402_ valid words on Cémantix (even if some do not exist in French); _46212_ for Cemantle.
-There's a 100% match between the model I have stripped from Google and the one used by Cemantle; 97% for Cémantix, as accents were a problem).
+There's a 100% match between the model I have stripped from Google and the one used by Cemantle; 97% for Cémantix (as accents were a problem apparently).
 
 The author has added protections client-side to make this bot useless (suspicious timing), so there's a standalone version of the bot now (just in case more protections were added).
 
