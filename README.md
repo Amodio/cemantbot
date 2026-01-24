@@ -32,6 +32,14 @@ The fallback algorithm (that should never be reached anyways) uses dot-product (
 3. finding the nearest neighbor for v in the Gensim/word2vec model and trying it,
 4. restarting until the secret word is found.
 
+## Explanation (in english)
+The main algorithm now uses the cosine similarity (temperature in the game) in a similar (reconstructed) [Word2Vec model](https://en.wikipedia.org/wiki/Word2vec) (with normalized vectors).
+
+It selects thin cosine shells (= hyperspherical slices) in the embedding space, which are words (vectors actually) near the one we search (including it) to try them.
+Each try intersects those shells (hyperplans) until we find the secret word (target vector). The first word is random.
+
+So to say it simply, the main algorithm implements a cosine similarity space inversion attack.
+
 ## Standalone script
 ```
 git clone https://github.com/Amodio/cemantbot.git
