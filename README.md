@@ -21,7 +21,7 @@ If paranoid on Chrome, you can restrict TamperMonkey's access only to: `https://
 ## Description
 The main algorithm is now drastically improved: it should **find the secret word in 3 attempts/words and less than 5 seconds** :)
 
-The standalone script find answers in **less than a second**.
+The standalone script finds answers in **less than a second**.
 You can either try the first two words yourself, or let the bot choose (first word is random).
 
 It basically bruteforces the cosine distance (temperature) for every tried word and selects the closest candidate.
@@ -33,12 +33,12 @@ The fallback algorithm (that should never be reached anyways) uses dot-product (
 4. restarting until the secret word is found.
 
 ## Explanation (in english)
-The main algorithm now uses the cosine similarity (temperature in the game) in a similar (reconstructed) [Word2Vec model](https://en.wikipedia.org/wiki/Word2vec) (with normalized vectors).
+The main algorithm now uses the cosine similarity (temperature in the game) in a (stripped) [Word2Vec model](https://en.wikipedia.org/wiki/Word2vec) (normalized vectors).
 
-It selects thin cosine shells (= hyperspherical slices) in the embedding space, which are words (vectors actually) near the one we search (including it) to try them.
+It selects thin cosine shells (= hyperspherical slices) in the embedding space, which are words (represented by vectors) near the one we search (including it), to try them.
 Each try intersects those shells (hyperplans) until we find the secret word (target vector). The first word is random.
 
-So to say it simply, the main algorithm implements a cosine similarity space inversion attack.
+So to put it simply, the main algorithm implements a cosine similarity space inversion attack.
 
 ## Standalone script
 ```
@@ -54,6 +54,6 @@ Models from [Jean-Philippe Fauconnier](https://fauconnier.github.io) and [Google
 I have tested _55402_ valid words on Cémantix (even if some do not exist in French); _46212_ for Cemantle.
 There's a 100% match between the model I have stripped from Google and the one used by Cemantle; 97% for Cémantix (as accents were a problem apparently).
 
-The author has added protections client-side to make this bot useless (suspicious timing), so there's a standalone version of the bot now (just in case more protections were added).
+The author has added protections client-side to make this bot useless (suspicious timing), so there's a standalone version of the bot now (just in case more protections were added client-side).
 
 Thanks to [vivien7806](https://github.com/vivien7806 "vivien7806") for the great help!
