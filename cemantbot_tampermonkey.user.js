@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Cemantix/Cemantle bot
 // @namespace    https://github.com/Amodio
-// @version      2025-05-16
+// @version      2026-08-23
 // @description  Bot for Cemantix/Cemantle word games
 // @author       Amodio
 // @match        https://cemantix.certitudes.org/*
@@ -10,6 +10,8 @@
 // @grant        GM_xmlhttpRequest
 // @run-at       document-start
 // @connect      static.certitudes.org
+// @connect      media.githubusercontent.com
+// @connect      raw.githubusercontent.com
 // ==/UserScript==
 
 (function() {
